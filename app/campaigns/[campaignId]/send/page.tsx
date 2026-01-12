@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { StepIndicator } from '@/components/campaigns';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -133,15 +132,27 @@ export default function SendPage() {
         animate={{ opacity: 1 }}
         className="max-w-3xl mx-auto space-y-6"
       >
-        {/* Step Indicator */}
-        <StepIndicator
-          currentStep={3}
-          completedSteps={allDone ? [1, 2] : [1]}
-          onStepClick={(step) => {
-            if (step === 1) router.push('/campaigns/new');
-            if (step === 2) router.push(`/campaigns/${campaign.id}/compose`);
-          }}
-        />
+        {/* Compact Step Indicator */}
+        <div className="flex items-center justify-between py-2 border-b border-border/50">
+          <div className="flex items-center gap-3">
+            <span className="text-sm font-medium text-primary">Step 3/3</span>
+            <span className="text-xs text-muted-foreground">Review & Send</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => router.push(`/campaigns/${campaign.id}/compose`)}
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+            >
+              ← Back to Compose
+            </button>
+            <button
+              onClick={() => router.push('/campaigns/new')}
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+            >
+              ← Back to Contacts
+            </button>
+          </div>
+        </div>
 
         {/* Header */}
         <div className="text-center">

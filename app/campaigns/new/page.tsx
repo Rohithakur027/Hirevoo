@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { StepIndicator, ContactUploader } from '@/components/campaigns';
+import { ContactUploader } from '@/components/campaigns';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -56,8 +56,13 @@ export default function NewCampaignPage() {
         animate={{ opacity: 1 }}
         className="max-w-3xl mx-auto space-y-6"
       >
-        {/* Step Indicator */}
-        <StepIndicator currentStep={1} />
+        {/* Compact Step Indicator */}
+        <div className="flex items-center justify-between py-2 border-b border-border/50">
+          <div className="flex items-center gap-3">
+            <span className="text-sm font-medium text-primary">Step 1/3</span>
+            <span className="text-xs text-muted-foreground">Upload Contacts</span>
+          </div>
+        </div>
 
         {/* Header */}
         <div className="text-center">

@@ -5,11 +5,10 @@ import { useRouter, useParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import {
-  StepIndicator,
-  ContactList,
+  ContactsList,
   EmailEditor,
-  AIAssistant,
 } from '@/components/campaigns';
+import { CampaignContact } from '@/types';
 import { Button } from '@/components/ui/button';
 import { useCampaign } from '@/context/CampaignContext';
 import { ArrowRight, ArrowLeft } from 'lucide-react';
@@ -57,6 +56,26 @@ export default function ComposePage() {
     updateContactEmail(currentContactId, subject, body);
   }, [currentContactId, updateContactEmail]);
 
+  const handleGenerateEmail = useCallback((prompt: string, tone: string) => {
+    if (!currentContactId) return;
+    // Simulate AI generation (would call API in real app)
+    const simulatedSubject = `${prompt.slice(0, 50)}${prompt.length > 50 ? '...' : ''}`;
+    const simulatedBody = `Dear ${currentContact?.name.split(' ')[0] || 'Contact'},
+
+${prompt}
+
+Best regards,
+[Your Name]`;
+
+    updateContactEmail(currentContactId, simulatedSubject, simulatedBody);
+  }, [currentContactId, currentContact?.name, updateContactEmail]);
+
+  const handleCopyToEditor = useCallback((text: string) => {
+    // This would handle copying text from AI to editor
+    console.log('Copying to editor:', text);
+  }, []);;
+
+
   const handleBack = () => {
     router.push('/campaigns/new');
   };
@@ -81,14 +100,19 @@ export default function ComposePage() {
         animate={{ opacity: 1 }}
         className="h-[calc(100vh-8rem)] flex flex-col"
       >
-        {/* Step Indicator */}
-        <StepIndicator
-          currentStep={2}
-          completedSteps={[1]}
-          onStepClick={(step) => {
-            if (step === 1) router.push('/campaigns/new');
-          }}
-        />
+        {/* Compact Step Indicator */}
+        <div className="flex items-center justify-between py-2 border-b border-border/50">
+          <div className="flex items-center gap-3">
+            <span className="text-sm font-medium text-primary">Step 2/3</span>
+            <span className="text-xs text-muted-foreground">Compose Emails</span>
+          </div>
+          <button
+            onClick={() => router.push('/campaigns/new')}
+            className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+          >
+            ← Back to Contacts
+          </button>
+        </div>
 
         {/* Header */}
         <div className="text-center mb-4">
@@ -98,31 +122,26 @@ export default function ComposePage() {
           </p>
         </div>
 
-        {/* 3-Panel Layout */}
-        <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 min-h-0">
-          {/* Left Panel - Contact List */}
-          <div className="lg:col-span-3 min-h-[300px] lg:min-h-0">
-            <ContactList
+        {/* Responsive Layout - Mobile: Stack, Desktop: Side-by-side */}
+        <div className="flex-1 grid grid-cols-1 lg:grid-cols-4 gap-3 lg:gap-4 min-h-0">
+          {/* Left column: Contacts List (Full Height) */}
+          <div className="lg:col-span-1 overflow-hidden">
+            <ContactsList
               contacts={campaign.contacts}
-              currentContactId={currentContactId}
-              onSelectContact={handleSelectContact}
+              selectedContactId={currentContactId || undefined}
+              onSelectContact={(contact: CampaignContact) => handleSelectContact(contact.id)}
             />
           </div>
 
-          {/* Middle Panel - Email Editor */}
-          <div className="lg:col-span-5 min-h-[400px] lg:min-h-0">
+          {/* Center/Right: Email Editor */}
+          <div className="lg:col-span-3 overflow-hidden">
             <EmailEditor
               contact={currentContact || null}
               onSaveDraft={handleSaveDraft}
               onMarkDone={handleMarkDone}
-            />
-          </div>
-
-          {/* Right Panel - AI Assistant */}
-          <div className="lg:col-span-4 min-h-[400px] lg:min-h-0">
-            <AIAssistant
-              contact={currentContact || null}
-              onCopyToEditor={handleCopyFromAI}
+              onGenerateEmail={handleGenerateEmail}
+              onCopyToEditor={handleCopyToEditor}
+              isGeneratingEmail={false}
             />
           </div>
         </div>
