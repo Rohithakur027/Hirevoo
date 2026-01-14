@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 import { NavigationSidebar } from "./navigation-sidebar"
+import { useCampaign } from "@/context/CampaignContext"
 
 type EmailStatus = "sent" | "in-queue" | "pending"
 
@@ -110,15 +111,15 @@ function PaperPlaneAnimation() {
 
 export function SendCampaignPage() {
     const router = useRouter()
-    const [contacts, setContacts] = useState<EmailContact[]>([
-        { id: "1", email: "rohit.thakur123@example.com", status: "sent" },
-        { id: "2", email: "jane.doe.test@mailnator.com", status: "in-queue" },
-        { id: "3", email: "john.smith.fake@gmail.com", status: "in-queue" },
-        { id: "4", email: "alice.wonderland99@tempmail.com", status: "in-queue" },
-        { id: "5", email: "bob.builder@example.com", status: "pending" },
-        { id: "6", email: "charlie.brown@example.com", status: "pending" },
-    ])
-    const [sentCount, setSentCount] = useState(1)
+    const { campaign } = useCampaign()
+
+    const contacts: EmailContact[] = campaign?.contacts.map(c => ({
+        id: c.id,
+        email: c.email,
+        status: "sent" as EmailStatus // In a real app, this would come from a sending service
+    })) || []
+
+    const [sentCount, setSentCount] = useState(0)
     const [isPaused, setIsPaused] = useState(false)
     const totalCount = contacts.length
     const queueCount = totalCount - sentCount

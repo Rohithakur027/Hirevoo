@@ -68,6 +68,17 @@ export function EmailEditor({
     const [isAttachmentModalOpen, setIsAttachmentModalOpen] = useState(false)
     const [attachedFiles, setAttachedFiles] = useState<AttachedFile[]>([])
 
+    // Handle case when no contact is selected
+    if (!selectedContact) {
+        return (
+            <Card className="h-full flex items-center justify-center bg-card border border-border rounded-lg">
+                <CardContent className="text-center">
+                    <p className="text-xs sm:text-sm text-muted-foreground">Select a contact to compose an email</p>
+                </CardContent>
+            </Card>
+        )
+    }
+
     const handleInsertVariable = () => {
         setEmailBody(emailBody + "{FirstName}")
     }

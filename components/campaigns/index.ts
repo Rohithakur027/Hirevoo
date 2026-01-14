@@ -1,5 +1,5 @@
 export { StepIndicator } from './StepIndicator';
-export { ContactUploader } from './ContactUploader';
+export { default as ContactUploader, Recipient } from './ContactUploader';
 export { ContactsList } from './ContactList';
 export { EmailEditor } from './EmailEditor';
 export { AIAssistant } from './AIAssistant';

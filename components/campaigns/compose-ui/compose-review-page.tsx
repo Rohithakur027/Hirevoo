@@ -10,6 +10,7 @@ import { AIAssistantModal } from "./ai-assistant-modal"
 import { SaveTemplateModal } from "./save-template-modal"
 import { MobileContactSheet } from "./mobile-contact-sheet"
 import { toast, Toaster } from "sonner"
+import { useCampaign } from "@/context/CampaignContext"
 
 export type Contact = {
     id: string
@@ -83,9 +84,29 @@ export function ComposeReviewPage() {
     const router = useRouter()
     const params = useParams()
     const campaignId = params?.campaignId as string || 'new-campaign'
+    const {
+        campaign,
+        updateContactEmail,
+        markContactDone,
+        currentContactId,
+        setCurrentContactId,
+        completedCount,
+        totalCount
+    } = useCampaign()
 
-    const [contacts, setContacts] = useState<Contact[]>(initialContacts)
-    const [selectedContactIndex, setSelectedContactIndex] = useState(0)
+    // Convert campaign contacts to the Contact format used by the UI
+    const contacts: Contact[] = campaign?.contacts.map(c => ({
+        id: c.id,
+        name: c.name,
+        email: c.email,
+        avatar: c.name.split(' ').map(n => n[0]).join('').toUpperCase(),
+        avatarColor: `bg-${['indigo', 'rose', 'amber', 'teal', 'slate', 'emerald'][Math.floor(Math.random() * 6)]}-500`,
+        status: c.emailStatus === 'done' ? 'ready' as const :
+               c.emailStatus === 'draft' ? 'draft' as const : 'pending' as const
+    })) || []
+
+    // Don't use local state for contacts - use campaign context
+    const setContacts = () => {} // Not needed since we use campaign context
     const [searchQuery, setSearchQuery] = useState("")
 
     const [subject, setSubject] = useState("")
@@ -105,20 +126,20 @@ export function ComposeReviewPage() {
             contact.email.toLowerCase().includes(searchQuery.toLowerCase()),
     )
 
-    const selectedContact = filteredContacts[selectedContactIndex] || filteredContacts[0]
-    const isLastContact = selectedContactIndex === filteredContacts.length - 1
-    const isFirstContact = selectedContactIndex === 0
+    const currentContact = currentContactId ? contacts.find(c => c.id === currentContactId) : null
+    const selectedContactIndex = currentContact ? filteredContacts.findIndex(c => c.id === currentContact.id) : 0
+    const selectedContact = currentContact || filteredContacts[0] || contacts[0] || null
 
-    const allReady = contacts.every((c) => c.status === "ready")
+    const isLastContact = selectedContact ? selectedContactIndex === filteredContacts.length - 1 : false
+    const isFirstContact = selectedContact ? selectedContactIndex === 0 : true
+
+    const allReady = completedCount === totalCount
 
     const handleSelectContact = useCallback(
         (contact: Contact) => {
-            const index = filteredContacts.findIndex((c) => c.id === contact.id)
-            if (index !== -1) {
-                setSelectedContactIndex(index)
-            }
+            setCurrentContactId(contact.id)
         },
-        [filteredContacts],
+        [setCurrentContactId],
     )
 
     const handleSelectTemplate = (template: { subject: string; body: string }) => {
@@ -132,16 +153,26 @@ export function ComposeReviewPage() {
 
     const handlePrevious = () => {
         if (selectedContactIndex > 0) {
-            setSelectedContactIndex((prev) => prev - 1)
+            const prevContact = filteredContacts[selectedContactIndex - 1]
+            if (prevContact) {
+                setCurrentContactId(prevContact.id)
+            }
         }
     }
 
     const handleDoneAndNext = () => {
-        setContacts((prev) => prev.map((c) => (c.id === selectedContact.id ? { ...c, status: "ready" as const } : c)))
+        if (!selectedContact) {
+            toast.error("No contact selected")
+            return
+        }
 
-        const willAllBeReady = contacts.every((c) => c.id === selectedContact.id || c.status === "ready")
+        // Save the email content
+        updateContactEmail(selectedContact.id, subject, emailBody)
 
-        if (isLastContact || willAllBeReady) {
+        // Mark contact as done
+        markContactDone(selectedContact.id)
+
+        if (completedCount + 1 >= totalCount) {
             toast.success("Campaign Submitted!", {
                 description: "Redirecting to send page...",
             })
@@ -150,7 +181,7 @@ export function ComposeReviewPage() {
                 router.push(`/campaigns/${campaignId}/send`)
             }, 500)
         } else {
-            setSelectedContactIndex((prev) => prev + 1)
+            // Reset for next contact
             setEmailBody("Hi {FirstName},\n\nI hope this email finds you well...")
             setSubject("")
             toast.success("Email saved!", {
@@ -213,6 +244,7 @@ export function ComposeReviewPage() {
                 allReady={allReady}
                 currentIndex={selectedContactIndex}
                 totalContacts={filteredContacts.length}
+                campaignId={campaignId}
             />
 
             <BrowseTemplatesModal
