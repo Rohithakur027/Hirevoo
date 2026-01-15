@@ -58,10 +58,24 @@ const CardContent = ({ children, className }: any) => (
   <div className={`p-4 ${className}`}>{children}</div>
 )
 
-export default function UploadContacts() {
+interface UploadContactsProps {
+  campaignName?: string
+  onCampaignNameChange?: (name: string) => void
+}
+
+export default function UploadContacts({ campaignName: propCampaignName, onCampaignNameChange }: UploadContactsProps = {}) {
   const router = useRouter()
   const { campaign } = useCampaign()
-  const [campaignName, setCampaignName] = useState("")
+  const [localCampaignName, setLocalCampaignName] = useState("")
+
+  const campaignName = propCampaignName !== undefined ? propCampaignName : localCampaignName
+  const setCampaignName = (val: string) => {
+    if (onCampaignNameChange) {
+      onCampaignNameChange(val)
+    } else {
+      setLocalCampaignName(val)
+    }
+  }
   const [recipients, setRecipients] = useState<Recipient[]>([])
   const [manualEmail, setManualEmail] = useState("")
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -160,7 +174,7 @@ export default function UploadContacts() {
               const nameKey = Object.keys(row).find(key => key.toLowerCase().includes('name'))
               const companyKey = Object.keys(row).find(key => key.toLowerCase().includes('company'))
               const roleKey = Object.keys(row).find(key => key.toLowerCase().includes('role') || key.toLowerCase().includes('title'))
-              
+
               parsedContacts.push({
                 id: crypto.randomUUID(),
                 email,
@@ -191,13 +205,13 @@ export default function UploadContacts() {
   // Import from Google Sheet
   const handleImportSheet = async () => {
     if (!googleSheetUrl.trim()) return
-    
+
     // Basic URL validation
     if (!googleSheetUrl.includes('docs.google.com/spreadsheets')) {
       alert('Please enter a valid Google Sheets URL')
       return
     }
-    
+
     alert('Google Sheets import: Make sure the sheet is publicly accessible. This requires Google Sheets API setup.')
   }
 
@@ -226,11 +240,11 @@ export default function UploadContacts() {
   const handleSaveEdit = (id: string) => {
     if (editingEmail.trim()) {
       setRecipients((prev) =>
-        prev.map((r) => r.id === id ? { 
-          ...r, 
-          email: editingEmail.trim(), 
+        prev.map((r) => r.id === id ? {
+          ...r,
+          email: editingEmail.trim(),
           name: editingEmail.split('@')[0],
-          isValid: isValidEmail(editingEmail.trim()) 
+          isValid: isValidEmail(editingEmail.trim())
         } : r)
       )
     }
@@ -244,7 +258,7 @@ export default function UploadContacts() {
   }
 
   const validCount = recipients.filter((r) => r.isValid).length
-  
+
   // Calculate duplicates
   const findDuplicates = () => {
     const emailCounts = recipients.reduce((acc: any, r) => {
@@ -252,12 +266,12 @@ export default function UploadContacts() {
       acc[email] = (acc[email] || 0) + 1
       return acc
     }, {})
-    
+
     return Object.values(emailCounts).reduce((sum: number, count: any) => {
       return sum + (count > 1 ? count - 1 : 0)
     }, 0)
   }
-  
+
   const duplicateCount = findDuplicates()
 
   return (
@@ -284,7 +298,7 @@ export default function UploadContacts() {
 
         {/* Left Column - All Input Options Stacked Vertically (No Scroll) */}
         <div className="space-y-3 flex flex-col overflow-y-auto">
-          
+
           {/* Add Recipients Card */}
           <Card className="flex-shrink-0">
             <CardHeader className="py-2">
@@ -487,9 +501,8 @@ export default function UploadContacts() {
                     ) : (
                       <>
                         <div className="flex items-center gap-2 flex-1 min-w-0">
-                          <div className={`h-4 w-4 rounded flex items-center justify-center flex-shrink-0 ${
-                            recipient.isValid ? "bg-green-500" : "bg-red-500"
-                          }`}>
+                          <div className={`h-4 w-4 rounded flex items-center justify-center flex-shrink-0 ${recipient.isValid ? "bg-green-500" : "bg-red-500"
+                            }`}>
                             <Check className="h-2.5 w-2.5 text-white" />
                           </div>
                           <div className={`text-xs truncate ${recipient.isValid ? "text-gray-800" : "text-red-500"}`}>

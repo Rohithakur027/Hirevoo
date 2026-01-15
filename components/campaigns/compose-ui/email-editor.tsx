@@ -12,6 +12,7 @@ import {
     ChevronLeft,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
 import { Badge } from "@/components/ui/badge"
@@ -39,6 +40,7 @@ interface EmailEditorProps {
     allReady: boolean
     currentIndex: number
     totalContacts: number
+    campaignId?: string
 }
 
 export function EmailEditor({
@@ -59,6 +61,7 @@ export function EmailEditor({
     allReady,
     currentIndex,
     totalContacts,
+    campaignId,
 }: EmailEditorProps) {
     const [showCc, setShowCc] = useState(false)
     const [showBcc, setShowBcc] = useState(false)
