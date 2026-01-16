@@ -41,6 +41,8 @@ interface EmailEditorProps {
     currentIndex: number
     totalContacts: number
     campaignId?: string
+    submitLabel?: string
+    onSend?: () => void
 }
 
 export function EmailEditor({
@@ -62,12 +64,13 @@ export function EmailEditor({
     currentIndex,
     totalContacts,
     campaignId,
+    submitLabel,
+    onSend,
 }: EmailEditorProps) {
     const [showCc, setShowCc] = useState(false)
     const [showBcc, setShowBcc] = useState(false)
     const [ccValue, setCcValue] = useState("")
     const [bccValue, setBccValue] = useState("")
-
     const [isAttachmentModalOpen, setIsAttachmentModalOpen] = useState(false)
     const [attachedFiles, setAttachedFiles] = useState<AttachedFile[]>([])
 
@@ -96,19 +99,22 @@ export function EmailEditor({
 
     return (
         <TooltipProvider delayDuration={200}>
-            <div className="flex-1 flex flex-col bg-background min-w-0">
-                {/* Step Indicator Header */}
-                <div className="px-4 md:px-6 py-2 border-b bg-muted/30">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <span className="text-sm font-semibold text-primary">Step 2/3</span>
-                            <span className="text-xs text-muted-foreground">Compose Emails</span>
+            <div className="flex-1 flex flex-col bg-background min-w-0 h-full">
+                {/* Step Indicator Header - Only show if part of campaign flow */}
+                {!submitLabel && (
+                    <div className="px-4 md:px-6 py-2 border-b bg-muted/30">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <span className="text-sm font-semibold text-primary">Step 2/3</span>
+                                <span className="text-xs text-muted-foreground">Compose Emails</span>
+                            </div>
+                            <span className="text-xs text-muted-foreground">
+                                {currentIndex + 1} of {totalContacts} contacts
+                            </span>
                         </div>
-                        <span className="text-xs text-muted-foreground">
-                            {currentIndex + 1} of {totalContacts} contacts
-                        </span>
                     </div>
-                </div>
+                )} { /* ... existing code ... */}
+
 
                 {/* Header Row 1 - To Field */}
                 <div className="px-4 md:px-6 py-3 border-b">
@@ -290,8 +296,13 @@ export function EmailEditor({
                 {/* Desktop Footer */}
                 <div className="hidden md:flex px-6 py-3 border-t items-center justify-between bg-background">
                     <div className="flex items-center gap-2">
-                        <Button className="bg-violet-600 hover:bg-violet-700 text-white font-medium cursor-pointer">Send</Button>
-                        <div className="flex items-center gap-0.5 ml-2 border-l pl-3">
+                        <Button
+                            onClick={onSend}
+                            className={cn("bg-violet-600 hover:bg-violet-700 text-white font-medium cursor-pointer", !onSend && "hidden")}
+                        >
+                            Send Now
+                        </Button>
+                        <div className={cn("flex items-center gap-0.5 ml-2 border-l pl-3", !onSend && "ml-0 border-l-0 pl-0")}>
                             <Button
                                 variant="ghost"
                                 size="icon"
@@ -314,17 +325,17 @@ export function EmailEditor({
                     </div>
                     <div className="flex items-center gap-2">
                         <Button
-                            variant={allReady || isLastContact ? "default" : "outline"}
+                            variant={allReady || isLastContact || submitLabel ? "default" : "outline"}
                             size="sm"
                             onClick={onDoneAndNext}
                             className={cn(
                                 "gap-1.5 cursor-pointer",
-                                allReady || isLastContact
+                                (allReady || isLastContact || submitLabel)
                                     ? "bg-violet-600 hover:bg-violet-700 text-white"
                                     : "bg-background border-muted-foreground/20 hover:bg-muted",
                             )}
                         >
-                            {allReady ? "Submit Campaign" : isLastContact ? "Submit Campaign" : "Done & Next"}
+                            {submitLabel || (allReady ? "Submit Campaign" : isLastContact ? "Submit Campaign" : "Done & Next")}
                             {!allReady && !isLastContact && <ChevronRight className="w-4 h-4" />}
                         </Button>
                     </div>

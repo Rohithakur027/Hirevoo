@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import UploadContacts from '@/components/campaigns/ContactUploader';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,15 +31,15 @@ export default function NewCampaignPage() {
   };
 
   return (
-    <DashboardLayout>
+    <div className="h-full w-full bg-background">
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="h-screen"
+        className="h-full"
       >
         {/* Upload Contacts Component */}
         <UploadContacts campaignName={campaignName} onCampaignNameChange={handleCampaignNameChange} />
       </motion.div>
-    </DashboardLayout>
+    </div>
   );
 }

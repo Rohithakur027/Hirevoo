@@ -37,9 +37,10 @@ export function CampaignTable({ campaigns }: CampaignTableProps) {
                 <table className="w-full">
                     <thead className="sticky top-0 bg-card">
                         <tr className="border-b border-border">
-                            <th className="pb-1 text-left text-[10px] font-medium text-muted-foreground">Campaign</th>
+                            <th className="pb-1 text-left text-[10px] font-medium text-muted-foreground w-[40%]">Campaign</th>
+                            <th className="pb-1 text-left text-[10px] font-medium text-muted-foreground">Date Created</th>
                             <th className="pb-1 text-center text-[10px] font-medium text-muted-foreground">CTR</th>
-                            <th className="pb-1 text-right text-[10px] font-medium text-muted-foreground">Action</th>
+                            <th className="pb-1 text-right text-[10px] font-medium text-muted-foreground">Manage Campaigns</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-border/50">
@@ -48,17 +49,20 @@ export function CampaignTable({ campaigns }: CampaignTableProps) {
 
                             return (
                                 <tr key={campaign.id} className="group">
-                                    <td className="py-1.5">
+                                    <td className="py-1.5 align-top">
                                         <p className="text-[11px] font-medium text-foreground truncate max-w-[200px]">{campaign.name}</p>
                                         <p className="text-[9px] text-muted-foreground">{campaign.sentCount.toLocaleString()} sent</p>
                                     </td>
-                                    <td className="py-1.5 text-center">
+                                    <td className="py-1.5 align-top text-left">
+                                        <p className="text-[10px] text-muted-foreground">{new Date(campaign.createdAt).toLocaleDateString()}</p>
+                                    </td>
+                                    <td className="py-1.5 align-top text-center">
                                         <span
                                             className={`inline-flex items-center rounded-full px-1.5 py-0 text-[10px] font-medium ${ctr >= 10
-                                                    ? "bg-emerald-500/15 text-emerald-600"
-                                                    : ctr >= 5
-                                                        ? "bg-amber-500/15 text-amber-600"
-                                                        : "bg-muted text-muted-foreground"
+                                                ? "bg-emerald-500/15 text-emerald-600"
+                                                : ctr >= 5
+                                                    ? "bg-amber-500/15 text-amber-600"
+                                                    : "bg-muted text-muted-foreground"
                                                 }`}
                                         >
                                             {ctr}%

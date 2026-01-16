@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -64,125 +63,127 @@ export default function CampaignsPage() {
   };
 
   return (
-    <DashboardLayout>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="space-y-6"
-      >
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold">Campaigns</h1>
-            <p className="text-muted-foreground mt-1">
-              Create and manage your email campaigns.
-            </p>
+    <div className="h-full overflow-y-auto bg-muted/30 p-4 md:p-8 pt-6">
+      <div className="mx-auto max-w-7xl">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="space-y-6"
+        >
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h1 className="text-3xl font-bold">Campaigns</h1>
+              <p className="text-muted-foreground mt-1">
+                Create and manage your email campaigns.
+              </p>
+            </div>
+            <Link href="/campaigns/new">
+              <Button className="gap-2 gradient-primary text-white">
+                <Plus className="h-4 w-4" />
+                New Campaign
+              </Button>
+            </Link>
           </div>
-          <Link href="/campaigns/new">
-            <Button className="gap-2 gradient-primary text-white">
-              <Plus className="h-4 w-4" />
-              New Campaign
-            </Button>
-          </Link>
-        </div>
 
-        {/* Campaign List or Empty State */}
-        {campaigns.length === 0 ? (
-          <EmptyState
-            icon={Mail}
-            title="No campaigns yet"
-            description="Create your first campaign to start sending personalized emails at scale."
-            action={{
-              label: 'Create Campaign',
-              onClick: () => window.location.href = '/campaigns/new',
-            }}
-          />
-        ) : (
-          <div className="grid gap-4">
-            {campaigns.map((c, index) => {
-              const status = statusConfig[c.status];
-              const StatusIcon = status.icon;
-              const nextAction = getNextAction(c);
-              const completedEmails = c.contacts.filter(ct => ct.emailStatus === 'done').length;
+          {/* Campaign List or Empty State */}
+          {campaigns.length === 0 ? (
+            <EmptyState
+              icon={Mail}
+              title="No campaigns yet"
+              description="Create your first campaign to start sending personalized emails at scale."
+              action={{
+                label: 'Create Campaign',
+                onClick: () => window.location.href = '/campaigns/new',
+              }}
+            />
+          ) : (
+            <div className="grid gap-4">
+              {campaigns.map((c, index) => {
+                const status = statusConfig[c.status];
+                const StatusIcon = status.icon;
+                const nextAction = getNextAction(c);
+                const completedEmails = c.contacts.filter(ct => ct.emailStatus === 'done').length;
 
-              return (
-                <motion.div
-                  key={c.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  <Card className="hover:shadow-md transition-shadow">
-                    <CardContent className="p-6">
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                        {/* Campaign Info */}
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <h3 className="text-lg font-semibold">{c.name}</h3>
-                            <Badge className={cn('gap-1', status.color)}>
-                              <StatusIcon className="w-3 h-3" />
-                              {status.label}
-                            </Badge>
-                          </div>
-                          
-                          <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                            <div className="flex items-center gap-1.5">
-                              <Users className="w-4 h-4" />
-                              <span>{c.contacts.length} contacts</span>
+                return (
+                  <motion.div
+                    key={c.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                  >
+                    <Card className="hover:shadow-md transition-shadow">
+                      <CardContent className="p-6">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                          {/* Campaign Info */}
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-2">
+                              <h3 className="text-lg font-semibold">{c.name}</h3>
+                              <Badge className={cn('gap-1', status.color)}>
+                                <StatusIcon className="w-3 h-3" />
+                                {status.label}
+                              </Badge>
                             </div>
-                            <div className="flex items-center gap-1.5">
-                              <Mail className="w-4 h-4" />
-                              <span>{completedEmails}/{c.contacts.length} emails written</span>
-                            </div>
-                            <div className="flex items-center gap-1.5">
-                              <Clock className="w-4 h-4" />
-                              <span>Updated {new Date(c.updatedAt).toLocaleDateString()}</span>
+
+                            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                              <div className="flex items-center gap-1.5">
+                                <Users className="w-4 h-4" />
+                                <span>{c.contacts.length} contacts</span>
+                              </div>
+                              <div className="flex items-center gap-1.5">
+                                <Mail className="w-4 h-4" />
+                                <span>{completedEmails}/{c.contacts.length} emails written</span>
+                              </div>
+                              <div className="flex items-center gap-1.5">
+                                <Clock className="w-4 h-4" />
+                                <span>Updated {new Date(c.updatedAt).toLocaleDateString()}</span>
+                              </div>
                             </div>
                           </div>
-                        </div>
 
-                        {/* Actions */}
-                        <div className="flex items-center gap-2">
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={() => handleDelete(c.id)}
-                            className="text-destructive hover:text-destructive"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                          
-                          {nextAction && (
-                            <Link href={nextAction.href}>
-                              <Button className="gap-2">
-                                {nextAction.label}
-                                <ArrowRight className="w-4 h-4" />
-                              </Button>
-                            </Link>
-                          )}
-                        </div>
-                      </div>
+                          {/* Actions */}
+                          <div className="flex items-center gap-2">
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              onClick={() => handleDelete(c.id)}
+                              className="text-destructive hover:text-destructive"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
 
-                      {/* Progress Bar */}
-                      {c.contacts.length > 0 && (
-                        <div className="mt-4">
-                          <div className="h-2 bg-muted rounded-full overflow-hidden">
-                            <motion.div
-                              className="h-full bg-emerald-500"
-                              initial={{ width: 0 }}
-                              animate={{ width: `${(completedEmails / c.contacts.length) * 100}%` }}
-                            />
+                            {nextAction && (
+                              <Link href={nextAction.href}>
+                                <Button className="gap-2">
+                                  {nextAction.label}
+                                  <ArrowRight className="w-4 h-4" />
+                                </Button>
+                              </Link>
+                            )}
                           </div>
                         </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              );
-            })}
-          </div>
-        )}
-      </motion.div>
-    </DashboardLayout>
+
+                        {/* Progress Bar */}
+                        {c.contacts.length > 0 && (
+                          <div className="mt-4">
+                            <div className="h-2 bg-muted rounded-full overflow-hidden">
+                              <motion.div
+                                className="h-full bg-emerald-500"
+                                initial={{ width: 0 }}
+                                animate={{ width: `${(completedEmails / c.contacts.length) * 100}%` }}
+                              />
+                            </div>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                );
+              })}
+            </div>
+          )}
+        </motion.div>
+      </div>
+    </div>
   );
 }

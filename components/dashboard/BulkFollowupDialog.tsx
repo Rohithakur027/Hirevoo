@@ -70,51 +70,54 @@ export function BulkFollowupDialog({ recipients, open, onOpenChange }: BulkFollo
                     <div className="space-y-2">
                         <Label className="text-xs font-medium flex items-center gap-1.5">
                             <Clock className="h-3.5 w-3.5" />
-                            Minimum wait time since initial email
+                            Who should receive a follow-up?
                         </Label>
-                        <RadioGroup value={timeLimit} onValueChange={setTimeLimit} className="grid grid-cols-2 gap-2">
-                            {[
-                                { value: "24", label: "24 hours" },
-                                { value: "36", label: "36 hours" },
-                                { value: "48", label: "48 hours", recommended: true },
-                                { value: "72", label: "72 hours" },
-                            ].map((opt) => (
-                                <div
-                                    key={opt.value}
-                                    className="flex items-center space-x-2 p-2 rounded-lg border border-border/50 hover:bg-muted/30"
-                                >
-                                    <RadioGroupItem value={opt.value} id={opt.value} />
-                                    <Label htmlFor={opt.value} className="text-xs cursor-pointer flex-1">
-                                        {opt.label}
-                                        {opt.recommended && <span className="text-primary ml-1">(Rec)</span>}
-                                    </Label>
+                        <RadioGroup value={timeLimit} onValueChange={setTimeLimit} className="grid gap-2">
+                            <div className="flex items-center space-x-2 p-3 rounded-lg border border-border/50 hover:bg-muted/30 transition-colors">
+                                <RadioGroupItem value="24" id="24h" />
+                                <div className="flex-1 cursor-pointer" onClick={() => setTimeLimit("24")}>
+                                    <Label htmlFor="24h" className="font-medium text-sm cursor-pointer">Since 24 hours ago</Label>
+                                    <p className="text-[10px] text-muted-foreground">Sent at least a day ago</p>
                                 </div>
-                            ))}
+                            </div>
+
+                            <div className="relative flex items-center space-x-2 p-3 rounded-lg border-2 border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors">
+                                <div className="absolute -top-2 right-4 bg-primary text-primary-foreground text-[9px] px-1.5 py-0.5 rounded-full font-bold uppercase tracking-wide">
+                                    Recommended
+                                </div>
+                                <RadioGroupItem value="48" id="48h" />
+                                <div className="flex-1 cursor-pointer" onClick={() => setTimeLimit("48")}>
+                                    <Label htmlFor="48h" className="font-medium text-sm cursor-pointer">Since 48 hours ago</Label>
+                                    <p className="text-[10px] text-muted-foreground">Standard waiting period (Best for conversions)</p>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center space-x-2 p-3 rounded-lg border border-border/50 hover:bg-muted/30 transition-colors">
+                                <RadioGroupItem value="0" id="all" />
+                                <div className="flex-1 cursor-pointer" onClick={() => setTimeLimit("0")}>
+                                    <Label htmlFor="all" className="font-medium text-sm cursor-pointer">Send to everyone</Label>
+                                    <p className="text-[10px] text-muted-foreground">Follow up with all contacts immediately</p>
+                                </div>
+                            </div>
                         </RadioGroup>
-                        <div className="flex items-center space-x-2 p-2 rounded-lg border border-border/50 hover:bg-muted/30">
-                            <RadioGroupItem value="0" id="all" />
-                            <Label htmlFor="all" className="text-xs cursor-pointer">
-                                Send to all (no time limit)
-                            </Label>
-                        </div>
                     </div>
 
                     {/* Warning for aggressive option */}
                     {timeLimit === "0" && (
-                        <div className="flex items-start gap-2 p-2.5 rounded-lg bg-amber-500/10 text-amber-700 text-[11px]">
+                        <div className="flex items-start gap-2 p-2.5 rounded-lg bg-red-500/10 text-red-700 dark:text-red-400 text-[11px] animate-in slide-in-from-top-2">
                             <AlertTriangle className="h-4 w-4 flex-shrink-0 mt-0.5" />
-                            <p>Sending follow-ups too soon may appear too eager and reduce response rates.</p>
+                            <p>Warning: Sending follow-ups too soon (under 24h) is considered spammy and may hurt your domain reputation.</p>
                         </div>
                     )}
                 </div>
 
-                <DialogFooter>
-                    <Button variant="outline" size="sm" onClick={() => onOpenChange(false)}>
+                <DialogFooter className="gap-2 sm:gap-0">
+                    <Button variant="ghost" size="sm" onClick={() => onOpenChange(false)}>
                         Cancel
                     </Button>
-                    <Button size="sm" onClick={handleSend}>
+                    <Button size="sm" onClick={handleSend} className="bg-violet-600 hover:bg-violet-700 text-white">
                         <Send className="mr-2 h-3.5 w-3.5" />
-                        Send to {eligibleRecipients.length} contacts
+                        Send Follow-ups
                     </Button>
                 </DialogFooter>
             </DialogContent>

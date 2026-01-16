@@ -22,6 +22,7 @@ export interface Campaign {
     openCount: number
     replyCount: number
     status: "active" | "completed" | "draft"
+    createdAt: string
 }
 
 export interface DailyData {
@@ -86,6 +87,7 @@ export const campaignsList: Campaign[] = [
         openCount: 850,
         replyCount: 120,
         status: "active",
+        createdAt: "2026-01-10T09:00:00Z",
     },
     {
         id: "c2",
@@ -94,6 +96,7 @@ export const campaignsList: Campaign[] = [
         openCount: 380,
         replyCount: 95,
         status: "active",
+        createdAt: "2026-01-12T14:30:00Z",
     },
     {
         id: "c3",
@@ -102,6 +105,7 @@ export const campaignsList: Campaign[] = [
         openCount: 1900,
         replyCount: 50,
         status: "completed",
+        createdAt: "2025-12-15T11:20:00Z",
     },
 ]
 
