@@ -65,7 +65,7 @@ interface UploadContactsProps {
 
 export default function UploadContacts({ campaignName: propCampaignName, onCampaignNameChange }: UploadContactsProps = {}) {
   const router = useRouter()
-  const { campaign } = useCampaign()
+  const { campaign, addContacts } = useCampaign()
   const [localCampaignName, setLocalCampaignName] = useState("")
 
   const campaignName = propCampaignName !== undefined ? propCampaignName : localCampaignName
@@ -547,8 +547,24 @@ export default function UploadContacts({ campaignName: propCampaignName, onCampa
                 disabled={validCount === 0}
                 title={validCount === 0 ? "Please add at least 1 email address to proceed" : "Continue to compose emails"}
                 onClick={() => {
-                  if (campaign?.id) {
-                    router.push(`/campaigns/${campaign.id}/compose`)
+                  const validContacts = recipients.filter(r => r.isValid)
+
+                  if (validContacts.length > 0) {
+                    // Create campaign with valid contacts and navigate immediately
+                    const campaignContacts = validContacts.map(r => ({
+                      name: r.name || r.email.split('@')[0],
+                      email: r.email,
+                      company: r.company,
+                      role: r.role
+                    }))
+
+                    addContacts(campaignContacts)
+
+                    // Use a timeout to ensure context is updated before navigation
+                    setTimeout(() => {
+                      const campaignId = campaign?.id || `campaign-${Date.now()}`
+                      router.push(`/campaigns/${campaignId}`)
+                    }, 50)
                   }
                 }}
               >
