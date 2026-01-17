@@ -550,7 +550,7 @@ export default function UploadContacts({ campaignName: propCampaignName, onCampa
                   const validContacts = recipients.filter(r => r.isValid)
 
                   if (validContacts.length > 0) {
-                    // Create campaign with valid contacts and navigate immediately
+                    // Create campaign with valid contacts and navigate to compose step
                     const campaignContacts = validContacts.map(r => ({
                       name: r.name || r.email.split('@')[0],
                       email: r.email,
@@ -560,11 +560,11 @@ export default function UploadContacts({ campaignName: propCampaignName, onCampa
 
                     addContacts(campaignContacts)
 
-                    // Use a timeout to ensure context is updated before navigation
+                    // Wait for campaign context to update, then navigate
                     setTimeout(() => {
-                      const campaignId = campaign?.id || `campaign-${Date.now()}`
-                      router.push(`/campaigns/${campaignId}`)
-                    }, 50)
+                      const campaignId = campaign?.id || 'current-campaign'
+                      router.push(`/campaigns/${campaignId}/compose`)
+                    }, 300)
                   }
                 }}
               >

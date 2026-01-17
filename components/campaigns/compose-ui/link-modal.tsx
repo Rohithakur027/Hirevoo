@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { X } from "lucide-react"
-import { Dialog, DialogContent } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -35,12 +35,12 @@ export function LinkModal({ isOpen, onClose, onInsert }: LinkModalProps) {
     return (
         <Dialog open={isOpen} onOpenChange={handleClose}>
             <DialogContent showCloseButton={false} className="sm:max-w-md p-0 gap-0">
-                <div className="flex items-center justify-between p-5 pb-4 border-b">
-                    <h2 className="text-lg font-semibold">Insert Link</h2>
+                <DialogHeader className="flex items-center justify-between p-5 pb-4 border-b">
+                    <DialogTitle className="text-lg font-semibold">Insert Link</DialogTitle>
                     <Button variant="ghost" size="icon" onClick={handleClose} className="h-8 w-8 hover:bg-muted">
                         <X className="h-4 w-4" />
                     </Button>
-                </div>
+                </DialogHeader>
 
                 <div className="space-y-4 p-5">
                     <div className="space-y-2">

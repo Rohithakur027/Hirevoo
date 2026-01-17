@@ -17,7 +17,6 @@ import {
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
-import { NavigationSidebar } from "./navigation-sidebar"
 import { useCampaign } from "@/context/CampaignContext"
 
 type EmailStatus = "sent" | "in-queue" | "pending"
@@ -116,7 +115,7 @@ export function SendCampaignPage() {
     const contacts: EmailContact[] = campaign?.contacts.map(c => ({
         id: c.id,
         email: c.email,
-        status: "sent" as EmailStatus // In a real app, this would come from a sending service
+        status: "pending" as EmailStatus // Start as pending
     })) || []
 
     const [sentCount, setSentCount] = useState(0)
@@ -134,12 +133,6 @@ export function SendCampaignPage() {
                     clearInterval(interval)
                     return prev
                 }
-                // Update contact status
-                setContacts((prevContacts) =>
-                    prevContacts.map((c, i) =>
-                        i === prev ? { ...c, status: "sent" as EmailStatus } : c
-                    )
-                )
                 return prev + 1
             })
         }, 2000)
@@ -171,10 +164,6 @@ export function SendCampaignPage() {
 
     return (
         <div className="flex h-screen bg-background">
-            <div className="hidden md:block">
-                <NavigationSidebar />
-            </div>
-
             <div className="flex-1 flex flex-col overflow-auto">
                 {/* Header */}
                 <div className="px-6 py-4 border-b bg-muted/30">

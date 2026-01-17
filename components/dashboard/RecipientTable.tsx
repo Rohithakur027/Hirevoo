@@ -4,16 +4,6 @@ import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
 import { Send, Eye, Zap, CheckCircle } from "lucide-react"
 import { getHoursSince, formatShortDate } from "@/lib/date-helpers"
 import { IndividualFollowupDialog } from "./IndividualFollowupDialog"
@@ -47,18 +37,22 @@ export function RecipientTable({ recipients: initialRecipients }: RecipientTable
         switch (status) {
             case "Replied":
                 return (
-                    <Badge className="bg-emerald-500/15 text-emerald-600 hover:bg-emerald-500/20 text-[9px] px-1.5 py-0 h-4 shadow-none border-0">
+                    <Badge className="bg-emerald-500 text-white hover:bg-emerald-600 text-xs px-3 py-1 h-auto shadow-none border-0 font-medium">
                         Replied
                     </Badge>
                 )
             case "Opened":
                 return (
-                    <Badge className="bg-amber-500/15 text-amber-600 hover:bg-amber-500/20 text-[9px] px-1.5 py-0 h-4 shadow-none border-0">
+                    <Badge className="bg-orange-100 text-orange-600 hover:bg-orange-200 text-xs px-3 py-1 h-auto shadow-none border border-orange-200 font-medium">
                         Opened
                     </Badge>
                 )
             case "Sent":
-                return <Badge className="bg-muted text-muted-foreground hover:bg-muted text-[9px] px-1.5 py-0 h-4 shadow-none border-0">Sent</Badge>
+                return (
+                    <Badge className="bg-slate-100 text-slate-600 hover:bg-slate-200 text-xs px-3 py-1 h-auto shadow-none border border-slate-200 font-medium">
+                        Sent
+                    </Badge>
+                )
         }
     }
 
@@ -70,72 +64,92 @@ export function RecipientTable({ recipients: initialRecipients }: RecipientTable
 
     return (
         <>
-            <Card className="flex h-full flex-col border-border/50 shadow-sm">
-                <CardHeader className="flex-shrink-0 pb-3 pt-4 px-4">
+            <Card className="flex h-full flex-col border-border/40 bg-white shadow-sm">
+                <CardHeader className="flex-shrink-0 pb-4 pt-5 px-5">
                     <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                            <CardTitle className="text-sm font-semibold">Email List</CardTitle>
-                            <span className="text-[10px] text-muted-foreground bg-muted px-2 py-0.5 rounded-full font-medium">
+                        <div className="flex items-center gap-3">
+                            <CardTitle className="text-lg font-semibold text-foreground">Email List</CardTitle>
+                            <span className="text-xs text-muted-foreground bg-slate-100 px-3 py-1 rounded-full font-medium">
                                 {recipients.length} contacts
                             </span>
                         </div>
-                        <Button size="sm" className="h-7 text-[10px] gap-1.5 bg-violet-600 hover:bg-violet-700 text-white" onClick={() => setShowBulkFollowup(true)}>
-                            <Zap className="h-3 w-3" />
+                        <Button
+                            className="h-9 text-sm gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-medium shadow-sm"
+                            onClick={() => setShowBulkFollowup(true)}
+                        >
+                            <Zap className="h-4 w-4" />
                             Quick Follow-up ({needsFollowupCount})
                         </Button>
                     </div>
                 </CardHeader>
-                <CardContent className="flex-1 overflow-auto px-0 pb-2">
+                <CardContent className="flex-1 overflow-auto px-0 pb-4">
                     <table className="w-full">
-                        <thead className="sticky top-0 bg-card z-10">
-                            <tr className="border-b border-border/50">
-                                <th className="pb-2 w-[40%] pl-4 text-left text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Contact</th>
-                                <th className="pb-2 w-[50px] text-center text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">View</th>
-                                <th className="pb-2 text-left text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Date</th>
-                                <th className="pb-2 text-center text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Status</th>
-                                <th className="pb-2 pr-4 text-right text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Actions</th>
+                        <thead className="sticky top-0 bg-white z-10">
+                            <tr className="border-b border-slate-200">
+                                <th className="pb-3 w-[35%] pl-5 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                                    Contact
+                                </th>
+                                <th className="pb-3 w-[60px] text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                                    View
+                                </th>
+                                <th className="pb-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                                    Date
+                                </th>
+                                <th className="pb-3 text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                                    Status
+                                </th>
+                                <th className="pb-3 pr-5 text-right text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                                    Actions
+                                </th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-border/50">
+                        <tbody className="divide-y divide-slate-100">
                             {recipients.map((recipient) => (
-                                <tr key={recipient.id} className="group hover:bg-muted/30 transition-colors">
-                                    <td className="py-2.5 pl-4">
+                                <tr key={recipient.id} className="group hover:bg-slate-50 transition-colors">
+                                    <td className="py-4 pl-5">
                                         <div className="flex flex-col">
-                                            <p className="text-[11px] font-medium text-foreground truncate max-w-[180px]">{recipient.name}</p>
-                                            <p className="text-[10px] text-muted-foreground truncate max-w-[180px]">{recipient.email}</p>
+                                            <p className="text-sm font-medium text-foreground">
+                                                {recipient.name}
+                                            </p>
+                                            <p className="text-xs text-[#4553f4]">
+                                                {recipient.email}
+                                            </p>
                                         </div>
                                     </td>
-                                    <td className="py-2.5 text-center w-[50px]">
+                                    <td className="py-4 text-center">
                                         <Button
                                             variant="ghost"
                                             size="sm"
-                                            className="h-6 w-6 p-0 hover:bg-violet-50 hover:text-violet-600 rounded-full"
+                                            className="h-8 w-8 p-0 hover:bg-slate-100 text-slate-500 hover:text-slate-700 rounded-full"
                                             onClick={() => handleViewChat(recipient)}
                                             title="View conversation"
                                         >
-                                            <Eye className="h-3.5 w-3.5" />
+                                            <Eye className="h-4 w-4" />
                                         </Button>
                                     </td>
-                                    <td className="py-2.5 text-left">
-                                        <span className="text-[10px] text-muted-foreground font-medium">{formatShortDate(recipient.sentAt)}</span>
+                                    <td className="py-4 text-left">
+                                        <span className="text-sm text-muted-foreground">
+                                            {formatShortDate(recipient.sentAt)}
+                                        </span>
                                     </td>
-                                    <td className="py-2.5 text-center">{getStatusBadge(recipient.status)}</td>
-                                    <td className="py-2.5 pr-4 text-right">
+                                    <td className="py-4 text-center">
+                                        {getStatusBadge(recipient.status)}
+                                    </td>
+                                    <td className="py-4 pr-5 text-right">
                                         <div className="flex items-center justify-end gap-1">
-                                            {/* Follow-up Button */}
                                             {shouldShowFollowUp(recipient) ? (
                                                 <Button
                                                     variant="ghost"
                                                     size="sm"
-                                                    className="h-6 px-2 text-[10px] hover:bg-violet-50 hover:text-violet-600 rounded-full"
+                                                    className="h-8 px-3 text-sm text-slate-600 hover:text-[#4553f4] hover:bg-slate-100 font-medium"
                                                     onClick={() => handleFollowUp(recipient)}
                                                 >
-                                                    <Send className="mr-1 h-3 w-3" />
+                                                    <Send className="mr-1.5 h-3.5 w-3.5" />
                                                     Follow Up
                                                 </Button>
                                             ) : (
-                                                <span className="text-[10px] text-emerald-600 px-2 font-medium flex items-center">
-                                                    <CheckCircle className="w-3 h-3 mr-1" />
+                                                <span className="text-sm text-emerald-600 px-3 font-medium flex items-center">
+                                                    <CheckCircle className="w-4 h-4 mr-1.5" />
                                                     Done
                                                 </span>
                                             )}
@@ -146,7 +160,9 @@ export function RecipientTable({ recipients: initialRecipients }: RecipientTable
                         </tbody>
                     </table>
                     {recipients.length === 0 && (
-                        <div className="py-8 text-center text-xs text-muted-foreground">No recipients found.</div>
+                        <div className="py-12 text-center text-sm text-muted-foreground">
+                            No recipients found.
+                        </div>
                     )}
                 </CardContent>
             </Card>

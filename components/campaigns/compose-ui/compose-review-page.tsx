@@ -1,10 +1,9 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState, useCallback, useEffect } from "react"
 import { useRouter, useParams } from "next/navigation"
 import { ContactSidebar } from "./contact-sidebar"
 import { EmailEditor } from "./email-editor"
-import { NavigationSidebar } from "./navigation-sidebar"
 import { BrowseTemplatesModal } from "./browse-templates-modal"
 import { AIAssistantModal } from "./ai-assistant-modal"
 import { SaveTemplateModal } from "./save-template-modal"
@@ -94,8 +93,44 @@ export function ComposeReviewPage() {
         totalCount
     } = useCampaign()
 
+    // ALL HOOKS MUST BE CALLED AT THE TOP LEVEL, BEFORE ANY CONDITIONAL LOGIC
+    const [isLoading, setIsLoading] = useState(true)
+    const [searchQuery, setSearchQuery] = useState("")
+    const [subject, setSubject] = useState("")
+    const [emailBody, setEmailBody] = useState("Hi {FirstName},\n\nI hope this email finds you well...")
+    const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false)
+    const [isAIModalOpen, setIsAIModalOpen] = useState(false)
+    const [isSaveModalOpen, setIsSaveModalOpen] = useState(false)
+    const [useTemplateForAll, setUseTemplateForAll] = useState(false)
+    const [savedTemplates, setSavedTemplates] = useState<SavedTemplate[]>([])
+
+    useEffect(() => {
+        const timer = setTimeout(() => setIsLoading(false), 2000)
+        return () => clearTimeout(timer)
+    }, [])
+
+    // Move useCallback BEFORE any conditional returns to satisfy Rules of Hooks
+    const handleSelectContact = useCallback(
+        (contact: Contact) => {
+            setCurrentContactId(contact.id)
+        },
+        [setCurrentContactId],
+    )
+
+    // Show loading while waiting for campaign
+    if (isLoading || !campaign || !campaign.contacts || campaign.contacts.length === 0) {
+        return (
+            <div className="flex h-screen items-center justify-center bg-background">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+                    <p className="text-muted-foreground">Loading campaign...</p>
+                </div>
+            </div>
+        )
+    }
+
     // Convert campaign contacts to the Contact format used by the UI
-    const contacts: Contact[] = campaign?.contacts.map(c => ({
+    const contacts: Contact[] = campaign.contacts.map(c => ({
         id: c.id,
         name: c.name,
         email: c.email,
@@ -103,22 +138,10 @@ export function ComposeReviewPage() {
         avatarColor: `bg-${['indigo', 'rose', 'amber', 'teal', 'slate', 'emerald'][Math.floor(Math.random() * 6)]}-500`,
         status: c.emailStatus === 'done' ? 'ready' as const :
                c.emailStatus === 'draft' ? 'draft' as const : 'pending' as const
-    })) || []
+    }))
 
     // Don't use local state for contacts - use campaign context
     const setContacts = () => {} // Not needed since we use campaign context
-    const [searchQuery, setSearchQuery] = useState("")
-
-    const [subject, setSubject] = useState("")
-    const [emailBody, setEmailBody] = useState("Hi {FirstName},\n\nI hope this email finds you well...")
-
-    const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false)
-    const [isAIModalOpen, setIsAIModalOpen] = useState(false)
-    const [isSaveModalOpen, setIsSaveModalOpen] = useState(false)
-
-    const [useTemplateForAll, setUseTemplateForAll] = useState(false)
-
-    const [savedTemplates, setSavedTemplates] = useState<SavedTemplate[]>([])
 
     const filteredContacts = contacts.filter(
         (contact) =>
@@ -134,13 +157,6 @@ export function ComposeReviewPage() {
     const isFirstContact = selectedContact ? selectedContactIndex === 0 : true
 
     const allReady = completedCount === totalCount
-
-    const handleSelectContact = useCallback(
-        (contact: Contact) => {
-            setCurrentContactId(contact.id)
-        },
-        [setCurrentContactId],
-    )
 
     const handleSelectTemplate = (template: { subject: string; body: string }) => {
         setSubject(template.subject)
@@ -206,10 +222,6 @@ export function ComposeReviewPage() {
 
     return (
         <div className="flex h-screen bg-background">
-            <div className="hidden md:block">
-                <NavigationSidebar />
-            </div>
-
             <MobileContactSheet
                 contacts={filteredContacts}
                 selectedContact={selectedContact}

@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState, useRef } from "react"
 import { X, Upload, Cloud, Monitor, FileText, ImageIcon, File, Check } from "lucide-react"
-import { Dialog, DialogContent } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
@@ -123,12 +123,12 @@ export function AttachmentModal({ isOpen, onClose, onAttach }: AttachmentModalPr
     return (
         <Dialog open={isOpen} onOpenChange={handleClose}>
             <DialogContent showCloseButton={false} className="max-w-lg p-0 gap-0 overflow-hidden">
-                <div className="flex items-center justify-between p-5 pb-4 border-b">
-                    <h2 className="text-lg font-semibold">Attach Files</h2>
+                <DialogHeader className="flex items-center justify-between p-5 pb-4 border-b">
+                    <DialogTitle className="text-lg font-semibold">Attach Files</DialogTitle>
                     <Button variant="ghost" size="icon" onClick={handleClose} className="h-8 w-8 hover:bg-muted">
                         <X className="h-4 w-4" />
                     </Button>
-                </div>
+                </DialogHeader>
 
                 <div className="flex border-b">
                     <button

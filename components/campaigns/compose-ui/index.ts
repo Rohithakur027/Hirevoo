@@ -1,5 +1,4 @@
 export { ComposeReviewPage } from "./compose-review-page"
-export { NavigationSidebar } from "./navigation-sidebar"
 export { ContactSidebar } from "./contact-sidebar"
 export { EmailEditor } from "./email-editor"
 export { TiptapEditor } from "./tiptap-editor"

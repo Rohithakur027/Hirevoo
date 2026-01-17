@@ -5,127 +5,124 @@ import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import {
   LayoutDashboard,
-  Mail,
   User,
-  Settings,
-  ChevronLeft,
-  ChevronRight,
-  Plus,
+  FolderOpen,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useState } from 'react';
-import { Badge } from '@/components/ui/badge';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
-// Hirevoo Logo Mark - Same as landing page
-const HirevooMark = ({ className = "h-4 w-4" }: { className?: string }) => (
-  <svg viewBox="0 0 24 24" fill="none" className={className}>
-    <path
-      d="M5 5V19M5 12H13"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-    />
-    <path
-      d="M13 7L18 12L13 17"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <circle cx="19.5" cy="12" r="1.5" fill="currentColor" />
-  </svg>
+// Custom Dashboard Icon (colorful bars like in the design)
+const DashboardIcon = ({ isActive }: { isActive: boolean }) => (
+  <div className="flex items-end gap-0.5 h-5 w-5">
+    <div className={cn("w-1.5 h-2 rounded-sm", isActive ? "bg-rose-500" : "bg-rose-400")} />
+    <div className={cn("w-1.5 h-3.5 rounded-sm", isActive ? "bg-amber-500" : "bg-amber-400")} />
+    <div className={cn("w-1.5 h-2.5 rounded-sm", isActive ? "bg-emerald-500" : "bg-emerald-400")} />
+    <div className={cn("w-1.5 h-4 rounded-sm", isActive ? "bg-sky-500" : "bg-sky-400")} />
+  </div>
 );
 
-const navigation: { name: string; href: string; icon: typeof LayoutDashboard; badge?: number }[] = [
-  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { name: 'Campaigns', href: '/campaigns', icon: Mail },
-  { name: 'New Campaign', href: '/campaigns/new', icon: Plus },
-  { name: 'Profile', href: '/profile', icon: User },
-  { name: 'Settings', href: '/settings', icon: Settings },
+// Custom Document Icon (notebook style)
+const DocumentIcon = ({ isActive }: { isActive: boolean }) => (
+  <div className={cn(
+    "h-5 w-5 rounded border-2 flex items-center justify-center",
+    isActive ? "border-amber-500 bg-amber-50" : "border-amber-400/70 bg-amber-50/50"
+  )}>
+    <div className="flex flex-col gap-0.5">
+      <div className={cn("w-2 h-0.5 rounded-full", isActive ? "bg-amber-500" : "bg-amber-400")} />
+      <div className={cn("w-2 h-0.5 rounded-full", isActive ? "bg-amber-500" : "bg-amber-400")} />
+    </div>
+  </div>
+);
+
+// Custom Team Icon (two people)
+const TeamIcon = ({ isActive }: { isActive: boolean }) => (
+  <div className="relative h-5 w-5 flex items-center justify-center">
+    <div className={cn(
+      "absolute left-0.5 h-3 w-3 rounded-full",
+      isActive ? "bg-[#4553f4]" : "bg-[#4553f4]/70"
+    )} />
+    <div className={cn(
+      "absolute right-0.5 h-3 w-3 rounded-full",
+      isActive ? "bg-[#4553f4]" : "bg-[#4553f4]/70"
+    )} />
+  </div>
+);
+
+// Custom Contact Icon (single person)
+const ContactIcon = ({ isActive }: { isActive: boolean }) => (
+  <div className="h-5 w-5 flex items-center justify-center">
+    <div className={cn(
+      "h-4 w-4 rounded-full flex items-center justify-center",
+      isActive ? "bg-slate-600" : "bg-slate-500"
+    )}>
+      <User className="h-2.5 w-2.5 text-white" />
+    </div>
+  </div>
+);
+
+// Custom Folder Icon
+const FolderIcon = ({ isActive }: { isActive: boolean }) => (
+  <div className="h-5 w-5 flex items-center justify-center">
+    <FolderOpen className={cn("h-5 w-5", isActive ? "text-orange-500" : "text-orange-400")} />
+  </div>
+);
+
+const navItems = [
+  { icon: DashboardIcon, label: "Dashboard", href: "/dashboard", iconType: "custom" },
+  { icon: DocumentIcon, label: "Campaigns", href: "/campaigns", iconType: "custom" },
+  { icon: TeamIcon, label: "Team", href: "/team", iconType: "custom" },
+  { icon: ContactIcon, label: "Contacts", href: "/contacts", iconType: "custom" },
+  { icon: FolderIcon, label: "Files", href: "/files", iconType: "custom" },
 ];
 
 export function Sidebar() {
   const pathname = usePathname();
-  const [collapsed, setCollapsed] = useState(false);
 
   return (
-    <aside
-      className={cn(
-        'fixed left-0 top-0 z-40 h-screen border-r border-border/50 bg-sidebar transition-all duration-300',
-        collapsed ? 'w-14' : 'w-52'
-      )}
-    >
-      <div className="flex h-full flex-col">
-        {/* Logo */}
-        <div className="flex h-14 items-center justify-between border-b border-border/50 px-3">
-          <Link href="/dashboard" className="flex items-center gap-2">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gray-900 dark:bg-white">
-              <HirevooMark className="h-4 w-4 text-white dark:text-gray-900" />
-            </div>
-            {!collapsed && (
-              <span className="font-semibold text-sm text-sidebar-foreground">
-                Hirevoo
-              </span>
-            )}
-          </Link>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-7 w-7 text-muted-foreground hover:bg-sidebar-accent/50"
-            onClick={() => setCollapsed(!collapsed)}
-          >
-            {collapsed ? (
-              <ChevronRight className="h-3.5 w-3.5" />
-            ) : (
-              <ChevronLeft className="h-3.5 w-3.5" />
-            )}
-          </Button>
-        </div>
+    <TooltipProvider delayDuration={100}>
+      <div className="relative flex flex-col w-16 border-r border-slate-200 bg-white h-screen">
+        {/* Active indicator bar */}
+        {navItems.map((item, index) => {
+          const isActive = pathname === item.href ||
+            (item.href !== '/dashboard' && pathname.startsWith(item.href));
+          return isActive ? (
+            <div
+              key={item.href}
+              className="absolute left-0 w-1 h-10 bg-[#4553f4] rounded-r-full transition-all duration-300"
+              style={{ top: `${64 + index * 56}px` }}
+            />
+          ) : null;
+        })}
 
-        {/* Navigation */}
-        <nav className="flex-1 space-y-0.5 p-1.5">
-          {navigation.map((item) => {
-            const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+        {/* Navigation Icons */}
+        <nav className="flex flex-col items-center pt-16 gap-2">
+          {navItems.map((item) => {
+            const isActive = pathname === item.href ||
+              (item.href !== '/dashboard' && pathname.startsWith(item.href));
+            const IconComponent = item.icon;
+
             return (
-              <Link
-                key={item.name}
-                href={item.href}
-                className={cn(
-                  'flex items-center gap-2.5 rounded-md px-2.5 py-2 text-xs font-medium transition-colors relative',
-                  isActive
-                    ? 'bg-sidebar-accent text-sidebar-accent-foreground'
-                    : 'text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground',
-                  collapsed && 'justify-center px-2'
-                )}
-              >
-                <item.icon className={cn('h-4 w-4 shrink-0', isActive && 'text-primary')} />
-                {!collapsed && (
-                  <>
-                    <span>{item.name}</span>
-                    {item.badge && (
-                      <Badge className="ml-auto bg-primary/10 text-primary text-[10px] px-1.5 h-4">
-                        {item.badge}
-                      </Badge>
+              <Tooltip key={item.label} delayDuration={0}>
+                <TooltipTrigger asChild>
+                  <Link
+                    href={item.href}
+                    className={cn(
+                      "flex items-center justify-center w-10 h-10 rounded-xl transition-all duration-200",
+                      isActive
+                        ? "bg-slate-100"
+                        : "hover:bg-slate-50"
                     )}
-                  </>
-                )}
-              </Link>
+                  >
+                    <IconComponent isActive={isActive} />
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent side="right" className="font-medium bg-slate-800 text-white border-0">
+                  {item.label}
+                </TooltipContent>
+              </Tooltip>
             );
           })}
         </nav>
-
-        {/* Minimal pro tip - only when expanded */}
-        {!collapsed && (
-          <div className="p-2 border-t border-border/50">
-            <Link href="/campaigns/new">
-              <Button size="sm" className="w-full h-8 text-xs gradient-primary text-white">
-                <Plus className="h-3.5 w-3.5 mr-1.5" />
-                New Campaign
-              </Button>
-            </Link>
-          </div>
-        )}
       </div>
-    </aside>
+    </TooltipProvider>
   );
 }
